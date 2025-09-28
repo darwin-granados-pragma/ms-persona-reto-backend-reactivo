@@ -3,6 +3,7 @@ package co.com.persona.usecase.person;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import co.com.persona.model.exception.ObjectNotFoundException;
 import co.com.persona.model.gateways.PersonRepository;
 import co.com.persona.model.gateways.TransactionalGateway;
 import co.com.persona.model.person.Person;
@@ -22,6 +23,7 @@ class PersonUseCaseTest {
 
   private PersonCreate personCreate;
   private Person person;
+  private String email;
 
   @Mock
   private PersonRepository repository;
@@ -43,6 +45,7 @@ class PersonUseCaseTest {
         .name(personCreate.getName())
         .email(personCreate.getEmail())
         .build();
+    email = personCreate.getEmail();
   }
 
   @Test
@@ -66,5 +69,39 @@ class PersonUseCaseTest {
             .getEmail()
             .equals(person.getEmail()))
         .verifyComplete();
+  }
+
+  @Test
+  void shouldReturnPersonByEmail() {
+    // Arrange
+    when(repository.findByEmail(email)).thenReturn(Mono.just(person));
+
+    // Act
+    var result = useCase.findByEmail(email);
+
+    // Assert
+    StepVerifier
+        .create(result)
+        .expectNextMatches(retrieved -> retrieved
+            .getEmail()
+            .equals(email) && retrieved
+            .getName()
+            .equals(person.getName()))
+        .verifyComplete();
+  }
+
+  @Test
+  void shouldThrowObjectNotFoundException_WhenPersonNotFound() {
+    // Arrange
+    when(repository.findByEmail(email)).thenReturn(Mono.empty());
+
+    // Act
+    var result = useCase.findByEmail(email);
+
+    // Assert
+    StepVerifier
+        .create(result)
+        .expectError(ObjectNotFoundException.class)
+        .verify();
   }
 }

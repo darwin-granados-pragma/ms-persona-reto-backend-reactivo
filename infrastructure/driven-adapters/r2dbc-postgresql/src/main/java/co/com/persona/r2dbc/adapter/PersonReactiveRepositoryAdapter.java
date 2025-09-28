@@ -39,4 +39,13 @@ public class PersonReactiveRepositoryAdapter extends
         )
         .doOnSuccess(personSaved -> log.debug("Person saved: {}", personSaved));
   }
+
+  @Override
+  public Mono<Person> findByEmail(String email) {
+    log.info("Retrieving person details by email: {}", email);
+    return super.repository
+        .findByEmail(email)
+        .map(this::toEntity)
+        .doOnSuccess(person -> log.debug("Person retrieved: {}", person));
+  }
 }
