@@ -1,5 +1,7 @@
 package co.com.persona.usecase.person;
 
+import co.com.persona.model.error.ErrorCode;
+import co.com.persona.model.exception.ObjectNotFoundException;
 import co.com.persona.model.gateways.PersonRepository;
 import co.com.persona.model.gateways.TransactionalGateway;
 import co.com.persona.model.person.Person;
@@ -28,5 +30,11 @@ public class PersonUseCase {
             .build())
         .flatMap(repository::save)
         .as(transactionalGateway::execute);
+  }
+
+  public Mono<Person> findByEmail(String email) {
+    return repository
+        .findByEmail(email)
+        .switchIfEmpty(Mono.error(new ObjectNotFoundException(ErrorCode.PERSON_NOT_FOUND, email)));
   }
 }
