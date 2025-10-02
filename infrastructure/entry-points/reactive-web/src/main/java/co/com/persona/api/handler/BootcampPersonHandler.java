@@ -38,4 +38,19 @@ public class BootcampPersonHandler {
                       .build());
             })));
   }
+
+  public Mono<ServerResponse> countPeopleByIdBootcamp(ServerRequest serverRequest) {
+    log.info("Received request to count people by bootcamp at path={} method={}",
+        serverRequest.path(),
+        serverRequest.method()
+    );
+    return Mono.defer(() -> {
+      String idBootcamp = serverRequest.pathVariable("idBootcamp");
+      return useCase
+          .getTotalPeopleByIdBootcamp(idBootcamp)
+          .flatMap(response -> ServerResponse
+              .ok()
+              .bodyValue(response));
+    });
+  }
 }

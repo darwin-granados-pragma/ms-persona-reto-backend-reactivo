@@ -38,6 +38,10 @@ public class BootcampPersonUseCase {
         });
   }
 
+  public Mono<Long> getTotalPeopleByIdBootcamp(String idBootcamp) {
+    return repository.countByIdBootcamp(idBootcamp);
+  }
+
   private Mono<Void> buildAndSave(Set<String> idsBootcamps, String idPerson) {
     return Flux
         .fromIterable(idsBootcamps)
