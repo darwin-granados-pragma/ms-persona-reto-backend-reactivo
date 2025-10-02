@@ -169,4 +169,22 @@ class BootcampPersonUseCaseTest {
         .verify();
     verify(repository, never()).save(any());
   }
+
+  @Test
+  void shouldGetTotalPeopleByIdBootcamp() {
+    // Arrange
+    String idBootcamp = "test-id-bootcamp";
+    long expectedCount = 5L;
+    when(repository.countByIdBootcamp(idBootcamp)).thenReturn(Mono.just(expectedCount));
+
+    // Act
+    var result = bootcampPersonUseCase.getTotalPeopleByIdBootcamp(idBootcamp);
+
+    // Assert
+    StepVerifier.create(result)
+        .expectNext(expectedCount)
+        .verifyComplete();
+
+    verify(repository, times(1)).countByIdBootcamp(idBootcamp);
+  }
 }

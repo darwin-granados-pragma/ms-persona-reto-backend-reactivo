@@ -6,4 +6,6 @@ import reactor.core.publisher.Mono;
 public interface BootcampPersonRepository {
 
   Mono<BootcampPerson> save(BootcampPerson data);
+
+  Mono<Long> countByIdBootcamp(String idBootcamp);
 }

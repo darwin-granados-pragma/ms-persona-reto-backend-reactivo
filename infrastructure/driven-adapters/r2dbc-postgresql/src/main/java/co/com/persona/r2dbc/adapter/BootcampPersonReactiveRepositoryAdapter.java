@@ -31,4 +31,10 @@ public class BootcampPersonReactiveRepositoryAdapter extends
         ));
   }
 
+  @Override
+  public Mono<Long> countByIdBootcamp(String idBootcamp) {
+    log.info("Getting total of people by bootcamp with id: {}", idBootcamp);
+    return super.repository.countByIdBootcamp(idBootcamp);
+  }
+
 }
