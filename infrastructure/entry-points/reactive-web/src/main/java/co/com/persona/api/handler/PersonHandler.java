@@ -42,4 +42,23 @@ public class PersonHandler {
                       .bodyValue(response));
             })));
   }
+
+  public Mono<ServerResponse> getPeopleByBootcamp(ServerRequest serverRequest) {
+    log.info("Received request to retrieve list of people by bootcamp at path={} method={}",
+        serverRequest.path(),
+        serverRequest.method()
+    );
+    return Mono.defer(() -> {
+      String idBootcamp = serverRequest.pathVariable("idBootcamp");
+      return useCase
+          .getAllPeopleByBootcamp(idBootcamp)
+          .map(mapper::toResponse)
+          .collectList()
+          .doOnNext(list -> log.info("Found {} people for bootcamp id={}", list.size(), idBootcamp))
+          .flatMap(response -> ServerResponse
+              .status(HttpStatus.OK)
+              .contentType(MediaType.APPLICATION_JSON)
+              .bodyValue(response));
+    });
+  }
 }

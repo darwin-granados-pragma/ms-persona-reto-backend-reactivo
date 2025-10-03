@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -47,5 +48,13 @@ public class PersonReactiveRepositoryAdapter extends
         .findByEmail(email)
         .map(this::toEntity)
         .doOnSuccess(person -> log.debug("Person retrieved: {}", person));
+  }
+
+  @Override
+  public Flux<Person> findByIdBootcamp(String idBootcamp) {
+    log.info("Retrieving all people associated with bootcamp ID: {}", idBootcamp);
+    return super.repository
+        .findByIdBootcamp(idBootcamp)
+        .map(this::toEntity);
   }
 }

@@ -15,6 +15,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -103,5 +104,36 @@ class PersonUseCaseTest {
         .create(result)
         .expectError(ObjectNotFoundException.class)
         .verify();
+  }
+
+  @Test
+  void shouldReturnAllPeopleByBootcamp() {
+    // Arrange
+    String idBootcamp = "bootcamp123";
+    Person anotherPerson = Person
+        .builder()
+        .id("Another id")
+        .name("Another name")
+        .email("Another email")
+        .build();
+    when(repository.findByIdBootcamp(idBootcamp)).thenReturn(Flux.just(person, anotherPerson));
+
+    // Act
+    var result = useCase.getAllPeopleByBootcamp(idBootcamp);
+
+    // Assert
+    StepVerifier
+        .create(result)
+        .expectNextMatches(p -> p
+            .getId()
+            .equals(person.getId()) && p
+            .getName()
+            .equals(person.getName()))
+        .expectNextMatches(p -> p
+            .getId()
+            .equals(anotherPerson.getId()) && p
+            .getName()
+            .equals(anotherPerson.getName()))
+        .verifyComplete();
   }
 }

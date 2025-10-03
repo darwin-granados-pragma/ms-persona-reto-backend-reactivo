@@ -1,6 +1,7 @@
 package co.com.persona.usecase.bootcamp;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -12,6 +13,7 @@ import co.com.persona.model.bootcamp.BootcampPersonCreate;
 import co.com.persona.model.exception.BusinessException;
 import co.com.persona.model.gateways.BootcampGateway;
 import co.com.persona.model.gateways.BootcampPersonRepository;
+import co.com.persona.model.gateways.ReportGateway;
 import co.com.persona.model.gateways.TransactionalGateway;
 import co.com.persona.model.person.Person;
 import co.com.persona.usecase.person.PersonUseCase;
@@ -46,6 +48,9 @@ class BootcampPersonUseCaseTest {
 
   @Mock
   private TransactionalGateway transactionalGateway;
+
+  @Mock
+  private ReportGateway reportGateway;
 
   @InjectMocks
   private BootcampPersonUseCase bootcampPersonUseCase;
@@ -92,9 +97,13 @@ class BootcampPersonUseCaseTest {
     when(bootcampGateway.getBootcampsDetailsByIds(bootcamps)).thenReturn(Flux.just(bootcamp1,
         bootcamp2
     ));
-    when(repository.save(any(BootcampPerson.class))).thenReturn(Mono.just(new BootcampPerson()));
+    when(repository.save(any(BootcampPerson.class))).thenAnswer(invocation -> {
+      BootcampPerson bp = invocation.getArgument(0);
+      return Mono.just(bp);
+    });
     when(transactionalGateway.execute(ArgumentMatchers.<Mono<?>>any())).thenAnswer(invocation -> invocation.getArgument(
         0));
+    when(reportGateway.upgradeTotalPeople(anyString())).thenReturn(Mono.empty());
 
     // Act
     var result = bootcampPersonUseCase.assignBootcampsToPerson(createData);
@@ -112,9 +121,13 @@ class BootcampPersonUseCaseTest {
     // Arrange
     when(personUseCase.findByEmail(createData.email())).thenReturn(Mono.just(person));
     when(bootcampGateway.getBootcampsDetailsByIds(bootcamps)).thenReturn(Flux.just(bootcamp1));
-    when(repository.save(any(BootcampPerson.class))).thenReturn(Mono.just(new BootcampPerson()));
+    when(repository.save(any(BootcampPerson.class))).thenAnswer(invocation -> {
+      BootcampPerson bp = invocation.getArgument(0);
+      return Mono.just(bp);
+    });
     when(transactionalGateway.execute(ArgumentMatchers.<Mono<?>>any())).thenAnswer(invocation -> invocation.getArgument(
         0));
+    when(reportGateway.upgradeTotalPeople(anyString())).thenReturn(Mono.empty());
 
     // Act
     var result = bootcampPersonUseCase.assignBootcampsToPerson(createData);
@@ -181,7 +194,8 @@ class BootcampPersonUseCaseTest {
     var result = bootcampPersonUseCase.getTotalPeopleByIdBootcamp(idBootcamp);
 
     // Assert
-    StepVerifier.create(result)
+    StepVerifier
+        .create(result)
         .expectNext(expectedCount)
         .verifyComplete();
 

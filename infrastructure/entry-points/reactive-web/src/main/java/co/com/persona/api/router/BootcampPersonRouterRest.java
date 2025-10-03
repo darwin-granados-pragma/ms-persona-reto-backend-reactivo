@@ -9,6 +9,7 @@ import co.com.persona.api.error.GlobalErrorWebFilter;
 import co.com.persona.api.handler.BootcampPersonHandler;
 import co.com.persona.api.model.request.BootcampPersonCreateRequest;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -66,6 +67,11 @@ public class BootcampPersonRouterRest {
       operation = @Operation(operationId = "countPeopleByIdBootcamp",
           summary = "Contar personas por bootcamp",
           description = "Recibe el id del bootcamp y retorna el total de personas asignadas a ese bootcamp",
+          parameters = @Parameter(name = "idBootcamp",
+              description = "ID del bootcamp del cual se desean obtener las personas",
+              required = true,
+              example = "1"
+          ),
           responses = {
               @ApiResponse(responseCode = "200", description = "Total de personas por bootcamp"
               ), @ApiResponse(responseCode = "404",

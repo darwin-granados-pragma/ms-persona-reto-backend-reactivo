@@ -8,6 +8,7 @@ import co.com.persona.model.person.Person;
 import co.com.persona.model.person.PersonCreate;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
@@ -30,6 +31,10 @@ public class PersonUseCase {
             .build())
         .flatMap(repository::save)
         .as(transactionalGateway::execute);
+  }
+
+  public Flux<Person> getAllPeopleByBootcamp(String idBootcamp) {
+    return repository.findByIdBootcamp(idBootcamp);
   }
 
   public Mono<Person> findByEmail(String email) {
