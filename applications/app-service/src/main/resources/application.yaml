@@ -30,9 +30,14 @@ management:
       enabled: true
 
 adapter:
-  restconsumer:
-    timeout: 5000
-    url: "${MS_PERSONA_REST_CONSUMER_URL}"
+  bootcamp:
+    restconsumer:
+      timeout: 5000
+      url: "${MS_PERSONA_BOOTCAMP_REST_CONSUMER_URL}"
+  report:
+    restconsumer:
+      timeout: 5000
+      url: "${MS_PERSONA_REPORT_REST_CONSUMER_URL}"
 cors:
   allowed-origins: '${CORS_ALLOWED_ORIGINS}'
 resilience4j:

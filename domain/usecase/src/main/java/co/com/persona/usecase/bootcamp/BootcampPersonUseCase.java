@@ -7,6 +7,7 @@ import co.com.persona.model.error.ErrorCode;
 import co.com.persona.model.exception.BusinessException;
 import co.com.persona.model.gateways.BootcampGateway;
 import co.com.persona.model.gateways.BootcampPersonRepository;
+import co.com.persona.model.gateways.ReportGateway;
 import co.com.persona.model.gateways.TransactionalGateway;
 import co.com.persona.usecase.person.PersonUseCase;
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ public class BootcampPersonUseCase {
   private final BootcampPersonRepository repository;
   private final BootcampGateway bootcampGateway;
   private final TransactionalGateway transactionalGateway;
+  private final ReportGateway reportGateway;
 
   public Mono<Void> assignBootcampsToPerson(BootcampPersonCreate data) {
     return personUseCase
@@ -55,6 +57,9 @@ public class BootcampPersonUseCase {
             .isNew(true)
             .build())
         .flatMap(repository::save)
+        .doOnNext(bootcampPerson -> reportGateway
+            .upgradeTotalPeople(bootcampPerson.getIdBootcamp())
+            .subscribe())
         .then();
   }
 
